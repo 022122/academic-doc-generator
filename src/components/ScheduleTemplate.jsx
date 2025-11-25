@@ -36,56 +36,24 @@ const ScheduleTemplate = forwardRef(({ data }, ref) => {
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>CS 1428</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>Foundations of Computer Science I</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>4.00</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>Mon, Wed, Fri</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>10:00 AM - 10:50 AM</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>DERR 238</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>Williams, D.</td>
-                </tr>
-                <tr>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>ENG 1310</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>College Writing I</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>3.00</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>Tue, Thu</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>12:30 PM - 1:50 PM</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>CENT 114</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>Miller, S.</td>
-                </tr>
-                <tr>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>MATH 2471</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>Calculus I</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>4.00</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>Mon, Wed, Fri</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>1:00 PM - 1:50 PM</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>MCS 590</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>Johnson, P.</td>
-                </tr>
-                <tr>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>COMM 1310</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>Fundamentals of Human Communication</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>3.00</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>Tue, Thu</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>9:30 AM - 10:50 AM</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>FH G01</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>Garcia, A.</td>
-                </tr>
-                <tr>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>US 1100</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>University Seminar</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>1.00</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>Wed</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>3:30 PM - 4:20 PM</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>UAC 105</td>
-                    <td style={{ border: '1px solid #ddd', padding: '10px' }}>Brown, M.</td>
-                </tr>
+                {data.courses && data.courses.current ? data.courses.current.map((course, idx) => (
+                    <tr key={idx}>
+                        <td style={{ border: '1px solid #ddd', padding: '10px' }}>{course.code}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '10px' }}>{course.name}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '10px' }}>{course.hours}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '10px' }}>Mon, Wed, Fri</td>
+                        <td style={{ border: '1px solid #ddd', padding: '10px' }}>10:00 AM - 10:50 AM</td>
+                        <td style={{ border: '1px solid #ddd', padding: '10px' }}>DERR 238</td>
+                        <td style={{ border: '1px solid #ddd', padding: '10px' }}>Williams, D.</td>
+                    </tr>
+                )) : (
+                    <tr><td colSpan="7" style={{ border: '1px solid #ddd', padding: '10px' }}>No schedule data</td></tr>
+                )}
             </tbody>
         </table>
         
         <div style={{ textAlign: 'right', fontWeight: 'bold', marginTop: '10px' }}>
-            Total Registered Credits: 15.00
+            Total Registered Credits: {data.stats && data.stats.current ? data.stats.current.attempted.toFixed(2) : '0.00'}
         </div>
 
         <div style={{ textAlign: 'center', marginTop: '30px', fontSize: '12px', color: '#777' }}>

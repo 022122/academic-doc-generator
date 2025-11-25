@@ -43,7 +43,7 @@ const TranscriptTemplate = forwardRef(({ data }, ref) => {
             </table>
         </div>
 
-        <div>
+            <div>
             <div style={{ backgroundColor: '#e0e0e0', fontWeight: 'bold', padding: '10px', marginTop: '20px' }}>{data.term}</div>
             <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
                 <thead>
@@ -56,55 +56,33 @@ const TranscriptTemplate = forwardRef(({ data }, ref) => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>CS 1428</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>Foundations of Computer Science I</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>A</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>4.00</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>16.00</td>
-                    </tr>
-                    <tr>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>ENG 1310</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>College Writing I</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>B</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>3.00</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>9.00</td>
-                    </tr>
-                    <tr>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>MATH 2471</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>Calculus I</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>A</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>4.00</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>16.00</td>
-                    </tr>
-                    <tr>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>COMM 1310</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>Fundamentals of Human Communication</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>B</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>3.00</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>9.00</td>
-                    </tr>
-                    <tr>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>US 1100</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>University Seminar</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>A</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>1.00</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>4.00</td>
-                    </tr>
+                    {data.courses && data.courses.current ? data.courses.current.map((course, idx) => (
+                        <tr key={idx}>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{course.code}</td>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{course.name}</td>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{course.grade}</td>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{course.hours}</td>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{course.qualityPoints}</td>
+                        </tr>
+                    )) : (
+                        <tr><td colSpan="5" style={{ border: '1px solid #ddd', padding: '8px' }}>No course data generated</td></tr>
+                    )}
                 </tbody>
             </table>
+            {data.stats && data.stats.current && (
             <table style={{ width: '100%', marginTop: '10px', borderCollapse: 'collapse' }}>
                 <tbody>
                     <tr>
                         <td style={{ padding: '2px 8px' }}><strong>Term Totals:</strong></td>
-                        <td style={{ padding: '2px 8px' }}>Attempted: 15.00</td>
-                        <td style={{ padding: '2px 8px' }}>Earned: 15.00</td>
-                        <td style={{ padding: '2px 8px' }}>GPA Hours: 15.00</td>
-                        <td style={{ padding: '2px 8px' }}>Quality Points: 54.00</td>
-                        <td style={{ padding: '2px 8px' }}><strong>Term GPA: 3.60</strong></td>
+                        <td style={{ padding: '2px 8px' }}>Attempted: {data.stats.current.attempted.toFixed(2)}</td>
+                        <td style={{ padding: '2px 8px' }}>Earned: {data.stats.current.earned.toFixed(2)}</td>
+                        <td style={{ padding: '2px 8px' }}>GPA Hours: {data.stats.current.attempted.toFixed(2)}</td>
+                        <td style={{ padding: '2px 8px' }}>Quality Points: {data.stats.current.qualityPoints.toFixed(2)}</td>
+                        <td style={{ padding: '2px 8px' }}><strong>Term GPA: {data.stats.current.gpa}</strong></td>
                     </tr>
                 </tbody>
             </table>
+            )}
 
             <div style={{ backgroundColor: '#e0e0e0', fontWeight: 'bold', padding: '10px', marginTop: '20px' }}>Spring 2025</div>
             <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
@@ -118,66 +96,45 @@ const TranscriptTemplate = forwardRef(({ data }, ref) => {
                     </tr>
                 </thead>
                  <tbody>
-                    <tr>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>CS 2308</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>Foundations of Computer Science II</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>B</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>3.00</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>9.00</td>
-                    </tr>
-                    <tr>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>MATH 2358</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>Discrete Mathematics I</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>B</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>3.00</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>9.00</td>
-                    </tr>
-                    <tr>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>ENG 1320</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>College Writing II</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>A</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>3.00</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>12.00</td>
-                    </tr>
-                    <tr>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>HIST 1310</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>History of the United States to 1877</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>C</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>3.00</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>6.00</td>
-                    </tr>
-                    <tr>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>PHYS 1430</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>Mechanics</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>B</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>4.00</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>12.00</td>
-                    </tr>
+                    {data.courses && data.courses.next ? data.courses.next.map((course, idx) => (
+                        <tr key={idx}>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{course.code}</td>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{course.name}</td>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{course.grade}</td>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{course.hours}</td>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{course.qualityPoints}</td>
+                        </tr>
+                    )) : (
+                        <tr><td colSpan="5" style={{ border: '1px solid #ddd', padding: '8px' }}>No course data generated</td></tr>
+                    )}
                 </tbody>
             </table>
+            {data.stats && data.stats.next && (
             <table style={{ width: '100%', marginTop: '10px', borderCollapse: 'collapse' }}>
                 <tbody>
                     <tr>
                         <td style={{ padding: '2px 8px' }}><strong>Term Totals:</strong></td>
-                        <td style={{ padding: '2px 8px' }}>Attempted: 16.00</td>
-                        <td style={{ padding: '2px 8px' }}>Earned: 16.00</td>
-                        <td style={{ padding: '2px 8px' }}>GPA Hours: 16.00</td>
-                        <td style={{ padding: '2px 8px' }}>Quality Points: 48.00</td>
-                        <td style={{ padding: '2px 8px' }}><strong>Term GPA: 3.00</strong></td>
+                        <td style={{ padding: '2px 8px' }}>Attempted: {data.stats.next.attempted.toFixed(2)}</td>
+                        <td style={{ padding: '2px 8px' }}>Earned: {data.stats.next.earned.toFixed(2)}</td>
+                        <td style={{ padding: '2px 8px' }}>GPA Hours: {data.stats.next.attempted.toFixed(2)}</td>
+                        <td style={{ padding: '2px 8px' }}>Quality Points: {data.stats.next.qualityPoints.toFixed(2)}</td>
+                        <td style={{ padding: '2px 8px' }}><strong>Term GPA: {data.stats.next.gpa}</strong></td>
                     </tr>
                 </tbody>
             </table>
+            )}
             
             <div style={{ marginTop: '25px', borderTop: '2px solid #333', paddingTop: '10px' }}>
+                {data.stats && data.stats.cumulative && (
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                      <tbody>
                      <tr>
                         <td style={{ padding: '2px 8px' }}><strong>Cumulative Totals:</strong></td>
-                        <td style={{ padding: '2px 8px' }}>Attempted: 31.00</td>
-                        <td style={{ padding: '2px 8px' }}>Earned: 31.00</td>
-                        <td style={{ padding: '2px 8px' }}>GPA Hours: 31.00</td>
-                        <td style={{ padding: '2px 8px' }}>Quality Points: 102.00</td>
-                        <td style={{ padding: '2px 8px' }}><strong>Cumulative GPA: 3.29</strong></td>
+                        <td style={{ padding: '2px 8px' }}>Attempted: {data.stats.cumulative.attempted}</td>
+                        <td style={{ padding: '2px 8px' }}>Earned: {data.stats.cumulative.earned}</td>
+                        <td style={{ padding: '2px 8px' }}>GPA Hours: {data.stats.cumulative.attempted}</td>
+                        <td style={{ padding: '2px 8px' }}>Quality Points: {data.stats.cumulative.qualityPoints}</td>
+                        <td style={{ padding: '2px 8px' }}><strong>Cumulative GPA: {data.stats.cumulative.gpa}</strong></td>
                     </tr>
                      <tr>
                         <td style={{ padding: '2px 8px' }}><strong>Academic Standing:</strong></td>
@@ -185,6 +142,7 @@ const TranscriptTemplate = forwardRef(({ data }, ref) => {
                     </tr>
                     </tbody>
                 </table>
+                )}
             </div>
         </div>
 

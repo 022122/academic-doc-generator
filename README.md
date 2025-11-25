@@ -3,6 +3,8 @@
 **Repository Name Suggestion**: `academic-doc-generator`  
 **Description**: A React-based tool for generating and exporting realistic academic document templates (Tuition Statement, Transcript, Schedule) for UI testing, verification flow development, and educational purposes.
 
+[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/022122/academic-doc-generator)
+
 ## 📖 简介 (Introduction)
 
 这是一个基于 **React** + **Vite** + **HeroUI** 构建的现代化 Web 应用，用于快速生成标准的学术文档模板（包括学费单、成绩单、课程表）。支持一键随机生成仿真数据，并提供多种导出格式（单图拼接、ZIP打包）。

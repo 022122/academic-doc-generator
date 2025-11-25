@@ -57,11 +57,11 @@ const TuitionTemplate = forwardRef(({ data }, ref) => {
             <tbody>
                 <tr>
                     <td style={{ padding: '12px 15px', borderBottom: '1px solid #dee2e6', width: '70%' }}>Tuition - Undergraduate (Non-Resident) - 15 Hours</td>
-                    <td style={{ padding: '12px 15px', borderBottom: '1px solid #dee2e6', textAlign: 'right' }}>$9,555.00</td>
+                    <td style={{ padding: '12px 15px', borderBottom: '1px solid #dee2e6', textAlign: 'right' }}>{data.tuition ? data.tuition.base : '$9,555.00'}</td>
                 </tr>
                 <tr>
-                    <td style={{ padding: '12px 15px', borderBottom: '1px solid #dee2e6' }}>Differential Tuition - College of Sci & Eng</td>
-                    <td style={{ padding: '12px 15px', borderBottom: '1px solid #dee2e6', textAlign: 'right' }}>$975.00</td>
+                    <td style={{ padding: '12px 15px', borderBottom: '1px solid #dee2e6' }}>Differential Tuition - {data.college}</td>
+                    <td style={{ padding: '12px 15px', borderBottom: '1px solid #dee2e6', textAlign: 'right' }}>{data.tuition ? data.tuition.differential : '$975.00'}</td>
                 </tr>
                 <tr>
                     <td style={{ padding: '12px 15px', borderBottom: '1px solid #dee2e6' }}>Student Service Fee</td>
@@ -99,11 +99,11 @@ const TuitionTemplate = forwardRef(({ data }, ref) => {
                 <tbody>
                     <tr>
                         <td style={{ padding: '5px' }}>Total Charges:</td>
-                        <td style={{ padding: '5px', textAlign: 'right' }}>$13,730.00</td>
+                        <td style={{ padding: '5px', textAlign: 'right' }}>{data.tuition ? data.tuition.total : '$13,730.00'}</td>
                     </tr>
                     <tr>
                         <td style={{ padding: '5px' }}>Payments/Credits (as of {data.statementDate}):</td>
-                        <td style={{ padding: '5px', textAlign: 'right' }}>($13,730.00)</td>
+                        <td style={{ padding: '5px', textAlign: 'right' }}>({data.tuition ? data.tuition.total : '$13,730.00'})</td>
                     </tr>
                     <tr>
                         <td style={{ padding: '5px', fontWeight: 'bold', fontSize: '18px', color: '#50212f' }}>BALANCE DUE:</td>
