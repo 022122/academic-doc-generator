@@ -23,6 +23,7 @@ const App = () => {
   const [activeCanvas, setActiveCanvas] = useState("main"); // "main" or "extra"
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
+  const [includeStudentCard, setIncludeStudentCard] = useState(true);
   const panStartRef = useRef({ x: 0, y: 0 });
 
   const tuitionRef = useRef(null);
@@ -157,18 +158,30 @@ const App = () => {
         return { name, data: canvas.toDataURL('image/png').split(',')[1] };
       };
 
-      const images = await Promise.all([
+      const imagesToCapture = [
         capture(hiddenTuitionRef, "Tuition_Statement.png"),
         capture(hiddenTranscriptRef, "Transcript.png"),
-        capture(hiddenScheduleRef, "Schedule.png")
-      ]);
+        capture(hiddenScheduleRef, "Schedule.png"),
+        capture(hiddenAdmissionRef, "Admission_Letter.png"),
+        capture(hiddenEnrollmentRef, "Enrollment_Certificate.png")
+      ];
+
+      if (includeStudentCard) {
+        imagesToCapture.push(
+          capture(hiddenCardFrontRef, "Student_ID_Front.png"),
+          capture(hiddenCardBackRef, "Student_ID_Back.png")
+        );
+      }
+
+      const images = await Promise.all(imagesToCapture);
 
       images.forEach(img => {
         if(img) zip.file(img.name, img.data, {base64: true});
       });
 
       const content = await zip.generateAsync({type:"blob"});
-      saveAs(content, "SheerID_Documents.zip");
+      const filename = includeStudentCard ? "SheerID_Documents_WithID.zip" : "SheerID_Documents.zip";
+      saveAs(content, filename);
       setIsGenerating(false);
 
     } catch (err) {
@@ -250,145 +263,173 @@ const App = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background text-foreground">
-      {/* Sidebar Controls */}
-      <div className="w-80 flex-shrink-0 border-r border-divider bg-content1 z-20">
-        <ScrollShadow className="h-full p-6">
-          <h2 className="text-2xl font-bold mb-4 text-primary">Input Information</h2>
+    <div className="flex flex-col h-screen overflow-hidden bg-background text-foreground">
+      {/* Top Toolbar */}
+      <div className="h-14 flex-shrink-0 border-b border-divider bg-content1 z-30 flex items-center px-4 gap-3">
+        <span className="font-bold text-primary text-sm">Stitch:</span>
+        <Button 
+          color="primary" 
+          variant="flat"
+          size="sm"
+          onClick={() => exportStitched(false)}
+          isLoading={isGenerating}
+        >
+          Grid
+        </Button>
+        <Button 
+          color="primary" 
+          variant="flat"
+          size="sm"
+          onClick={() => exportStitched(true)}
+          isLoading={isGenerating}
+        >
+          Horizontal
+        </Button>
 
-          <Button 
-            color="secondary" 
-            variant="flat"
-            className="w-full mb-6"
-            onClick={regenerateData}
-          >
-            Regenerate Random Data
-          </Button>
-          
-          <div className="flex flex-col gap-6">
-            <Input label="University Name" name="universityName" value={formData.universityName} onChange={handleInputChange} variant="bordered" labelPlacement="outside" placeholder="Enter university name" />
-            <Input label="University Address" name="universityAddress" value={formData.universityAddress} onChange={handleInputChange} variant="bordered" labelPlacement="outside" placeholder="Enter university address" />
-            
-            <div>
-                <label className="block text-sm font-medium text-foreground mb-2">University Logo (Optional)</label>
-                <input 
-                    type="file" 
-                    accept="image/*"
-                    onChange={handleLogoUpload}
-                    className="block w-full text-sm text-slate-500
-                      file:mr-4 file:py-2 file:px-4
-                      file:rounded-full file:border-0
-                      file:text-sm file:font-semibold
-                      file:bg-violet-50 file:text-violet-700
-                      hover:file:bg-violet-100
-                      cursor-pointer
-                    "
-                />
-            </div>
+        <Divider orientation="vertical" className="h-8" />
 
-            <Input label="Student Name" name="studentName" value={formData.studentName} onChange={handleInputChange} variant="bordered" labelPlacement="outside" placeholder="Enter student name" />
-            <Input label="Student ID" name="studentID" value={formData.studentID} onChange={handleInputChange} variant="bordered" labelPlacement="outside" placeholder="Enter student ID" />
-            <Input label="Address" name="address" value={formData.address} onChange={handleInputChange} variant="bordered" labelPlacement="outside" placeholder="Enter address" />
-            <Input label="Term" name="term" value={formData.term} onChange={handleInputChange} variant="bordered" labelPlacement="outside" placeholder="Enter term" />
-            <Input label="Major" name="major" value={formData.major} onChange={handleInputChange} variant="bordered" labelPlacement="outside" placeholder="Enter major" />
-            <Input label="Program" name="program" value={formData.program} onChange={handleInputChange} variant="bordered" labelPlacement="outside" placeholder="Enter program" />
-            <Input label="College" name="college" value={formData.college} onChange={handleInputChange} variant="bordered" labelPlacement="outside" placeholder="Enter college" />
-            
-            <Divider className="my-2" />
-            <h3 className="text-xl font-semibold">Dates</h3>
-            
-            <Input label="Statement Date" name="statementDate" value={formData.statementDate} onChange={handleInputChange} variant="bordered" labelPlacement="outside" placeholder="MM/DD/YYYY" />
-            <Input label="Due Date" name="dueDate" value={formData.dueDate} onChange={handleInputChange} variant="bordered" labelPlacement="outside" placeholder="MM/DD/YYYY" />
-            <Input label="Issue Date" name="issueDate" value={formData.issueDate} onChange={handleInputChange} variant="bordered" labelPlacement="outside" placeholder="MM/DD/YYYY" />
-            
-            <Divider className="my-2" />
-            
-            <Select 
-              label="Export Format" 
-              selectedKeys={[exportMode]} 
-              onChange={(e) => setExportMode(e.target.value)}
-              variant="bordered"
-              labelPlacement="outside"
-            >
-              <SelectItem key="stitched" value="stitched">One Stitched Image (Grid)</SelectItem>
-              <SelectItem key="stitched-horizontal" value="stitched-horizontal">One Stitched Image (Horizontal Row)</SelectItem>
-              <SelectItem key="zipped" value="zipped">Three Separate Images (Zip)</SelectItem>
-            </Select>
+        <span className="font-bold text-primary text-sm">ZIP:</span>
+        <label className="flex items-center gap-1 text-xs cursor-pointer">
+          <input 
+            type="checkbox" 
+            checked={includeStudentCard} 
+            onChange={(e) => setIncludeStudentCard(e.target.checked)}
+            className="w-3 h-3 rounded"
+          />
+          +ID Card
+        </label>
+        <Button 
+          color="success" 
+          size="sm"
+          onClick={exportZipped}
+          isLoading={isGenerating}
+        >
+          Download ZIP
+        </Button>
 
-            <Button 
-              color="primary" 
-              className="w-full font-bold text-lg mt-4" 
-              size="lg"
-              onClick={handleExport}
-              isLoading={isGenerating}
-            >
-              {isGenerating ? "Generating..." : "Download"}
-            </Button>
+        <Divider orientation="vertical" className="h-8" />
 
-            <Divider className="my-4" />
-            <h3 className="text-xl font-semibold mb-2">Extra Documents</h3>
-            <div className="flex flex-col gap-3">
-                <Button 
-                    color="default" 
-                    variant="flat" 
-                    className="w-full" 
-                    onClick={() => exportSingle(hiddenAdmissionRef, "Admission_Letter.png")}
-                    isLoading={isGenerating}
-                >
-                    Download Admission Letter
-                </Button>
-                <Button 
-                    color="default" 
-                    variant="flat" 
-                    className="w-full" 
-                    onClick={() => exportSingle(hiddenEnrollmentRef, "Enrollment_Certificate.png")}
-                    isLoading={isGenerating}
-                >
-                    Download Enrollment Cert
-                </Button>
-            </div>
-
-            <Divider className="my-4" />
-            <h3 className="text-xl font-semibold mb-2">Student ID Card</h3>
-            <div className="mb-4">
-                <label className="block text-sm font-medium text-foreground mb-2">Student Photo</label>
-                <input 
-                    type="file" 
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    className="block w-full text-sm text-slate-500
-                      file:mr-4 file:py-2 file:px-4
-                      file:rounded-full file:border-0
-                      file:text-sm file:font-semibold
-                      file:bg-violet-50 file:text-violet-700
-                      hover:file:bg-violet-100
-                      cursor-pointer
-                    "
-                />
-            </div>
-            <div className="flex flex-col gap-3">
-                <Button 
-                    color="default" 
-                    variant="flat" 
-                    className="w-full" 
-                    onClick={() => exportSingle(hiddenCardFrontRef, "Student_ID_Front.png")}
-                    isLoading={isGenerating}
-                >
-                    Download ID Front
-                </Button>
-                <Button 
-                    color="default" 
-                    variant="flat" 
-                    className="w-full" 
-                    onClick={() => exportSingle(hiddenCardBackRef, "Student_ID_Back.png")}
-                    isLoading={isGenerating}
-                >
-                    Download ID Back
-                </Button>
-            </div>
-          </div>
-        </ScrollShadow>
+        <span className="font-bold text-foreground/60 text-sm">Single:</span>
+        <Button 
+          color="default" 
+          variant="flat"
+          size="sm"
+          onClick={() => exportSingle(hiddenAdmissionRef, "Admission_Letter.png")}
+          isLoading={isGenerating}
+        >
+          Admission
+        </Button>
+        <Button 
+          color="default" 
+          variant="flat"
+          size="sm"
+          onClick={() => exportSingle(hiddenEnrollmentRef, "Enrollment_Certificate.png")}
+          isLoading={isGenerating}
+        >
+          Enrollment
+        </Button>
+        <Button 
+          color="default" 
+          variant="flat"
+          size="sm"
+          onClick={() => exportSingle(hiddenCardFrontRef, "Student_ID_Front.png")}
+          isLoading={isGenerating}
+        >
+          ID Front
+        </Button>
+        <Button 
+          color="default" 
+          variant="flat"
+          size="sm"
+          onClick={() => exportSingle(hiddenCardBackRef, "Student_ID_Back.png")}
+          isLoading={isGenerating}
+        >
+          ID Back
+        </Button>
       </div>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar - Input Data */}
+        <div className="w-80 flex-shrink-0 border-r border-divider bg-content1 z-20">
+          <ScrollShadow className="h-full p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-primary">Input Data</h2>
+              <Button 
+                color="secondary" 
+                variant="flat"
+                size="sm"
+                onClick={regenerateData}
+              >
+                Randomize
+              </Button>
+            </div>
+            
+            <div className="flex flex-col gap-4">
+              {/* Images Section */}
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-foreground mb-1">University Logo</label>
+                  <Button 
+                    as="label" 
+                    variant="flat" 
+                    size="sm" 
+                    className="w-full cursor-pointer"
+                  >
+                    Choose File
+                    <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+                  </Button>
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-foreground mb-1">Student Photo</label>
+                  <Button 
+                    as="label" 
+                    variant="flat" 
+                    size="sm" 
+                    className="w-full cursor-pointer"
+                  >
+                    Choose File
+                    <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
+                  </Button>
+                </div>
+              </div>
+
+              <Divider className="my-1" />
+              <h3 className="text-sm font-semibold text-foreground/70">University Info</h3>
+              
+              <Input label="University Name" name="universityName" value={formData.universityName} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+              <Input label="University Address" name="universityAddress" value={formData.universityAddress} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+
+              <Divider className="my-1" />
+              <h3 className="text-sm font-semibold text-foreground/70">Student Info</h3>
+              
+              <Input label="Student Name" name="studentName" value={formData.studentName} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+              <Input label="Student ID" name="studentID" value={formData.studentID} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+              <Input label="Address" name="address" value={formData.address} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+              
+              <Divider className="my-1" />
+              <h3 className="text-sm font-semibold text-foreground/70">Academic Info</h3>
+              
+              <Input label="Term" name="term" value={formData.term} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+              <Input label="Major" name="major" value={formData.major} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+              <Input label="Program" name="program" value={formData.program} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+              <Input label="College" name="college" value={formData.college} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+              
+              <Divider className="my-1" />
+              <h3 className="text-sm font-semibold text-foreground/70">Dates</h3>
+              
+              <Input label="Statement Date" name="statementDate" value={formData.statementDate} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+              <Input label="Due Date" name="dueDate" value={formData.dueDate} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+              <Input label="Issue Date" name="issueDate" value={formData.issueDate} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+              
+              <Divider className="my-1" />
+              <h3 className="text-sm font-semibold text-foreground/70">Student ID Card</h3>
+              
+              <Input label="Card Subtitle" name="cardSubtitle" value={formData.cardSubtitle} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+              <Input label="Card Issue Date" name="cardIssueDate" value={formData.cardIssueDate} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+              <Input label="Card Valid Until" name="cardValidDate" value={formData.cardValidDate} onChange={handleInputChange} variant="bordered" labelPlacement="outside" size="sm" />
+            </div>
+          </ScrollShadow>
+        </div>
 
       {/* Hidden Export Containers - Rendered purely for capture */}
       {/* Positioned way off-screen to ensure no visual interference but valid DOM rendering */}
@@ -605,6 +646,7 @@ const App = () => {
                 )}
             </AnimatePresence>
         </div>
+      </div>
       </div>
     </div>
   );
