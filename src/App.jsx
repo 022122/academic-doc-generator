@@ -22,7 +22,6 @@ import SalaryStatementTemplate from './components/SalaryStatementTemplate';
 const App = () => {
   const [formData, setFormData] = useState(() => generateRandomData());
 
-  const [exportMode, setExportMode] = useState("stitched-horizontal"); 
   const [isGenerating, setIsGenerating] = useState(false);
   const [scale, setScale] = useState(0.55); 
   const [activeCanvas, setActiveCanvas] = useState("main"); // "main" or "extra"
@@ -272,16 +271,6 @@ const App = () => {
         console.error(err);
         alert("Export failed");
         setIsGenerating(false);
-    }
-  };
-
-  const handleExport = () => {
-    if (exportMode === "stitched") {
-      exportStitched(false); 
-    } else if (exportMode === "stitched-horizontal") {
-      exportStitched(true);
-    } else {
-      exportZipped();
     }
   };
 
@@ -581,49 +570,55 @@ const App = () => {
       {/* Hidden Export Containers - Rendered purely for capture */}
       {/* Positioned way off-screen to ensure no visual interference but valid DOM rendering */}
       <div style={{ position: 'absolute', top: '-9999px', left: '-9999px', display: 'flex', flexDirection: 'column' }}>
-          {/* Core 3 Docs */}
-          <div style={{ backgroundColor: 'white', width: '800px', minHeight: '1000px' }}>
-            <TuitionTemplate ref={hiddenTuitionRef} data={formData} />
-          </div>
-          <div style={{ backgroundColor: 'white', width: '800px', minHeight: '1000px' }}>
-            <TranscriptTemplate ref={hiddenTranscriptRef} data={formData} />
-          </div>
-          <div style={{ backgroundColor: 'white', width: '800px', minHeight: '1000px' }}>
-            <ScheduleTemplate ref={hiddenScheduleRef} data={formData} />
-          </div>
-          
-          {/* Extra 2 Docs */}
-          <div style={{ backgroundColor: 'white', width: '800px', minHeight: '1000px' }}>
-            <AdmissionLetterTemplate ref={hiddenAdmissionRef} data={formData} />
-          </div>
-          <div style={{ backgroundColor: 'white', width: '800px', minHeight: '1000px' }}>
-            <EnrollmentCertificateTemplate ref={hiddenEnrollmentRef} data={formData} />
-          </div>
-          
-          {/* Student ID Card */}
-          <div style={{ backgroundColor: 'white', width: '750px', height: '480px' }}>
-            <StudentCardFrontTemplate ref={hiddenCardFrontRef} data={formData} />
-          </div>
-          <div style={{ backgroundColor: 'white', width: '750px', height: '480px' }}>
-            <StudentCardBackTemplate ref={hiddenCardBackRef} data={formData} />
-          </div>
-          
-          {/* Teacher Documents */}
-          <div style={{ backgroundColor: '#ffffff', width: '595px', height: '842px' }}>
-            <TeachingCertificateTemplate ref={hiddenTeachingCertRef} data={formData} />
-          </div>
-          <div style={{ backgroundColor: '#ffffff', width: '595px', height: '842px' }}>
-            <EmploymentLetterTemplate ref={hiddenEmploymentLetterRef} data={formData} />
-          </div>
-          <div style={{ backgroundColor: '#ffffff', width: '595px', height: '842px' }}>
-            <SalaryStatementTemplate ref={hiddenSalaryStatementRef} data={formData} />
-          </div>
-          <div style={{ backgroundColor: 'white', width: '750px', height: '480px' }}>
-            <TeacherIdFrontTemplate ref={hiddenTeacherIdFrontRef} data={formData} />
-          </div>
-          <div style={{ backgroundColor: 'white', width: '750px', height: '480px' }}>
-            <TeacherIdBackTemplate ref={hiddenTeacherIdBackRef} data={formData} />
-          </div>
+          {userMode === "student" ? (
+            <>
+              {/* Core 3 Docs */}
+              <div style={{ backgroundColor: 'white', width: '800px', minHeight: '1000px' }}>
+                <TuitionTemplate ref={hiddenTuitionRef} data={formData} />
+              </div>
+              <div style={{ backgroundColor: 'white', width: '800px', minHeight: '1000px' }}>
+                <TranscriptTemplate ref={hiddenTranscriptRef} data={formData} />
+              </div>
+              <div style={{ backgroundColor: 'white', width: '800px', minHeight: '1000px' }}>
+                <ScheduleTemplate ref={hiddenScheduleRef} data={formData} />
+              </div>
+
+              {/* Extra 2 Docs */}
+              <div style={{ backgroundColor: 'white', width: '800px', minHeight: '1000px' }}>
+                <AdmissionLetterTemplate ref={hiddenAdmissionRef} data={formData} />
+              </div>
+              <div style={{ backgroundColor: 'white', width: '800px', minHeight: '1000px' }}>
+                <EnrollmentCertificateTemplate ref={hiddenEnrollmentRef} data={formData} />
+              </div>
+
+              {/* Student ID Card */}
+              <div style={{ backgroundColor: 'white', width: '750px', height: '480px' }}>
+                <StudentCardFrontTemplate ref={hiddenCardFrontRef} data={formData} />
+              </div>
+              <div style={{ backgroundColor: 'white', width: '750px', height: '480px' }}>
+                <StudentCardBackTemplate ref={hiddenCardBackRef} data={formData} />
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Teacher Documents */}
+              <div style={{ backgroundColor: '#ffffff', width: '595px', height: '842px' }}>
+                <TeachingCertificateTemplate ref={hiddenTeachingCertRef} data={formData} />
+              </div>
+              <div style={{ backgroundColor: '#ffffff', width: '595px', height: '842px' }}>
+                <EmploymentLetterTemplate ref={hiddenEmploymentLetterRef} data={formData} />
+              </div>
+              <div style={{ backgroundColor: '#ffffff', width: '595px', height: '842px' }}>
+                <SalaryStatementTemplate ref={hiddenSalaryStatementRef} data={formData} />
+              </div>
+              <div style={{ backgroundColor: 'white', width: '750px', height: '480px' }}>
+                <TeacherIdFrontTemplate ref={hiddenTeacherIdFrontRef} data={formData} />
+              </div>
+              <div style={{ backgroundColor: 'white', width: '750px', height: '480px' }}>
+                <TeacherIdBackTemplate ref={hiddenTeacherIdBackRef} data={formData} />
+              </div>
+            </>
+          )}
       </div>
 
       {/* Main Preview Area - Infinite Canvas Style */}
@@ -778,6 +773,7 @@ const App = () => {
                 {activeCanvas === "extra" && (
                     <motion.div 
                         key="extra-canvas"
+                        ref={containerRef}
                         className="absolute flex flex-row gap-10 p-20 origin-center"
                         initial={{ opacity: 0, scale: scale * 0.9 }}
                         animate={{ opacity: 1, scale: scale }}
@@ -826,6 +822,7 @@ const App = () => {
                 {activeCanvas === "card" && (
                     <motion.div 
                         key="card-canvas"
+                        ref={containerRef}
                         className="absolute flex flex-row gap-10 p-20 origin-center"
                         initial={{ opacity: 0, scale: scale * 0.9 }}
                         animate={{ opacity: 1, scale: scale }}
